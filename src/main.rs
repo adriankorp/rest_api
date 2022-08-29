@@ -1,7 +1,9 @@
 use actix_web::{get, web, App, HttpRequest, HttpResponse, HttpServer, Responder};
 use chrono::Datelike;
+use rand::prelude::*;
 use serde_json::json;
 use std::collections::HashMap;
+use unicode_segmentation::UnicodeSegmentation;
 
 pub fn extract_query(query_str: &str) -> HashMap<&str, &str> {
     let mut q: HashMap<&str, &str> = HashMap::new();
@@ -94,10 +96,62 @@ async fn calculate_dissel_usage_for_distance(req: HttpRequest) -> impl Responder
     }));
 }
 
+#[get("/probabilityOfUnitInjectorFail")]
+async fn probability_of_unit_injector_fail(req: HttpRequest) -> impl Responder {
+    let query = &extract_query(req.query_string());
+
+    let vin = match query.get("VIN") {
+        Some(x) => Some(x),
+        None => None,
+    };
+    let mut rng = rand::thread_rng();
+    let fail_probability = rng.gen_range(0..100);
+
+    if vin.is_some() {
+        let vin_length = vin.unwrap().to_string().graphemes(true).count();
+
+        if vin_length > 17 {
+            return HttpResponse::BadRequest().json(json!({
+              "result": "To long VIN",
+              "status": 400
+            }));
+        }
+
+        if vin_length < 17 {
+            return HttpResponse::BadRequest().json(json!({
+              "result": "To short VIN",
+              "status": 400
+            }));
+        }
+
+        if vin_length == 17 {
+            return HttpResponse::Ok().json(json!({
+              "result": {"failProbability": format!("{}%", fail_probability)},
+              "status": 200
+            }));
+        }
+    }
+    if vin.is_none() {
+        return HttpResponse::Ok().json(json!({
+          "result": {"failProbability": format!("{}%", fail_probability)},
+          "status": 200
+        }));
+    }
+
+    return HttpResponse::BadRequest().json(json!({
+      "result": "Bad Request",
+      "status": 400
+    }));
+}
+
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    HttpServer::new(|| App::new().service(calculate_dissel_usage_for_distance))
-        .bind(("127.0.0.1", 8080))?
-        .run()
-        .await
+    HttpServer::new(|| {
+        App::new()
+            .service(calculate_dissel_usage_for_distance)
+            .service(probability_of_unit_injector_fail)
+    })
+    .bind(("127.0.0.1", 8080))?
+    .run()
+    .await
 }
