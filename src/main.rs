@@ -1,4 +1,4 @@
-use actix_web::{get, web, App, HttpRequest, HttpResponse, HttpServer, Responder};
+use actix_web::{get, App, HttpRequest, HttpResponse, HttpServer, Responder};
 use chrono::Datelike;
 use rand::prelude::*;
 use serde_json::json;
