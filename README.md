@@ -11,7 +11,7 @@ To run the project locally:
 
 Dependency | Description
 --- | ---
-[actix-web](https://actix.rs/) | Actix Web lets you quickly and confidently develop web services in Rust and this guide will get you going in no time.
+[actix-web](https://actix.rs/) | Actix Web is a powerful, pragmatic, and extremely fast web framework for Rust.
 [serde_json](https://crates.io/crates/serde_json/1.0.1) | Serde is a framework for serializing and deserializing Rust data structures efficiently and generically.
 [chrono](https://crates.io/crates/chrono) | Date and time utilities
 [unicode-segmentation](https://crates.io/crates/unicode-segmentation) | Iterators which split strings on Grapheme Cluster or Word boundaries, according to the Unicode Standard Annex #29 rules.
